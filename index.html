@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Presença Pro - Dashboard Individual</title>
+    <title>Gestão Pro - Ata e Chamada</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -18,23 +19,17 @@
 
     <div id="loginScreen" class="flex items-center justify-center min-h-screen p-6">
         <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-blue-100 max-w-sm w-full text-center border border-white">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-blue-200">
-                <span class="text-white text-2xl font-black italic">GP</span>
-            </div>
-            <h1 class="text-xl font-extrabold mb-8 uppercase italic tracking-tight">Admin Dashboard</h1>
+            <h1 class="text-xl font-extrabold mb-8 uppercase italic tracking-tight">Acesso Administrativo</h1>
             <input type="password" id="adminPass" placeholder="Senha" class="w-full bg-slate-50 border-2 border-slate-100 focus:border-blue-600 p-4 rounded-2xl mb-4 outline-none text-center font-bold">
-            <button onclick="fazerLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition active:scale-95 shadow-lg shadow-blue-100">ENTRAR</button>
+            <button onclick="fazerLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition shadow-lg shadow-blue-100 uppercase text-xs">Entrar</button>
         </div>
     </div>
 
     <div id="mainContent" class="hidden-section max-w-7xl mx-auto p-4 md:p-8">
         
         <header class="flex justify-between items-center mb-8 bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic text-sm">UM</div>
-                <h1 class="text-sm font-black text-slate-800 uppercase italic">Painel de Controle</h1>
-            </div>
-            <button onclick="window.location.reload()" class="bg-slate-100 text-slate-500 px-5 py-2 rounded-xl font-bold text-[10px] uppercase hover:bg-red-50 hover:text-red-500 transition-all">Sair</button>
+            <h1 class="text-sm font-black text-blue-600 uppercase italic">Gestão de Atas e Presença</h1>
+            <button onclick="window.location.reload()" class="bg-slate-100 text-slate-500 px-5 py-2 rounded-xl font-bold text-[10px] uppercase">Sair</button>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -42,75 +37,60 @@
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-white p-6 rounded-[2rem] shadow-xl border border-slate-200">
                     <h2 class="font-extrabold text-slate-800 mb-6 uppercase text-[10px] tracking-widest italic flex items-center gap-2">
-                        <span class="w-2 h-2 bg-blue-600 rounded-full"></span> 📊 Performance por Pessoa
+                        <span class="w-2 h-2 bg-blue-600 rounded-full"></span> 👥 Funcionários
                     </h2>
-                    
                     <div class="relative flex items-center mb-6">
-                        <input type="text" id="novoFuncionario" placeholder="Cadastrar funcionário..." class="w-full border-2 border-slate-50 p-4 pr-14 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-xs transition-all">
-                        <button onclick="cadastrarFuncionario()" class="absolute right-2 bg-blue-600 text-white w-10 h-10 rounded-xl font-black shadow-md hover:bg-blue-700 transition">+</button>
+                        <input type="text" id="novoFuncionario" placeholder="Cadastrar..." class="w-full border-2 border-slate-50 p-4 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-xs">
+                        <button onclick="cadastrarFuncionario()" class="absolute right-2 bg-blue-600 text-white w-10 h-10 rounded-xl font-black shadow-md">+</button>
                     </div>
-
-                    <div id="listaFuncionariosCadastrados" class="max-h-[500px] overflow-y-auto space-y-3 pr-2 custom-scroll">
-                        </div>
+                    <div id="listaFuncionariosCadastrados" class="max-h-[500px] overflow-y-auto space-y-3 pr-2 custom-scroll"></div>
                 </div>
             </div>
 
             <div class="lg:col-span-8 space-y-6">
                 <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200">
                     <h2 class="font-extrabold text-slate-800 mb-6 uppercase text-[10px] tracking-widest italic flex items-center gap-2">
-                        <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> 📅 Nova Chamada
+                        <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> 📅 Agendar Reunião com Pauta
                     </h2>
-                    <div class="flex flex-col md:flex-row gap-4 mb-4">
-                        <input type="text" id="tituloReuniao" placeholder="Título da Reunião" class="flex-1 border-2 border-slate-50 p-4 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-sm font-medium transition-all">
-                        <input type="datetime-local" id="dataReuniao" class="border-2 border-slate-50 p-4 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-sm transition-all">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <input type="text" id="tituloReuniao" placeholder="Título da Reunião" class="border-2 border-slate-50 p-4 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-sm font-medium">
+                        <input type="datetime-local" id="dataReuniao" class="border-2 border-slate-50 p-4 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-sm">
                     </div>
-                    <button onclick="criarReuniao()" class="w-full bg-[#1e293b] text-white font-black py-4 rounded-2xl hover:bg-black transition-all shadow-xl uppercase tracking-widest text-xs">Agendar</button>
+                    <textarea id="pautaReuniao" placeholder="Tópicos de debate (um por linha)..." class="w-full border-2 border-slate-50 p-4 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-sm mb-4 h-24"></textarea>
+                    <button onclick="criarReuniao()" class="w-full bg-[#1e293b] text-white font-black py-4 rounded-2xl hover:bg-black transition-all shadow-xl uppercase text-xs tracking-widest">Agendar Reunião</button>
                 </div>
 
-                <div id="gridReunioes" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    </div>
+                <div id="gridReunioes" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
         </div>
 
         <div id="modalChamada" class="fixed inset-0 bg-slate-900/60 hidden-section flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-            <div class="bg-white w-full max-w-2xl rounded-[2.5rem] p-8 shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="bg-white w-full max-w-4xl rounded-[2.5rem] p-8 shadow-2xl flex flex-col max-h-[90vh]">
                 <div class="flex justify-between items-start mb-6 border-b pb-4">
                     <div>
                         <h3 id="chamadaTitulo" class="text-xl font-black text-slate-800 uppercase italic">---</h3>
-                        <p id="chamadaData" class="text-blue-500 font-bold text-[9px] mt-1 uppercase"></p>
+                        <p id="chamadaData" class="text-blue-500 font-bold text-[9px] mt-1 uppercase tracking-widest"></p>
                     </div>
-                    <button onclick="fecharModal()" class="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg text-slate-300 hover:text-red-500 font-black">×</button>
+                    <button onclick="fecharModal()" class="text-slate-300 hover:text-red-500 font-black">×</button>
                 </div>
-                <div id="corpoChamada" class="overflow-y-auto space-y-2 flex-1 pr-4 custom-scroll"></div>
-                <div class="grid grid-cols-2 gap-3 mt-6">
-                    <button onclick="gerarRelatorio()" class="bg-slate-100 text-slate-600 font-extrabold py-4 rounded-2xl text-xs uppercase italic">Relatório</button>
-                    <button onclick="fecharModal()" class="bg-blue-600 text-white font-extrabold py-4 rounded-2xl shadow-lg text-xs uppercase italic">Salvar</button>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto pr-2 custom-scroll">
+                    <div>
+                        <h4 class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest italic">Lista de Chamada</h4>
+                        <div id="corpoChamada" class="space-y-2"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest italic">Conteúdo da Ata (Debates e Decisões)</h4>
+                        <textarea id="obsAta" oninput="salvarObsTemporaria()" class="w-full h-72 border-2 border-slate-50 p-4 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-sm" placeholder="Anote aqui os pontos discutidos..."></textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
+                    <button onclick="gerarRelatorioPDF()" class="bg-slate-900 text-white font-black py-4 rounded-2xl text-xs uppercase shadow-lg hover:bg-black transition">GERAR ATA EM PDF</button>
+                    <button onclick="fecharModal()" class="bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg text-xs uppercase hover:bg-blue-700 transition">SALVAR E SAIR</button>
                 </div>
             </div>
         </div>
-
-        <div id="modalRelatorio" class="fixed inset-0 bg-slate-900/90 hidden-section flex items-center justify-center p-4 z-[60]">
-            <div class="bg-white w-full max-w-sm rounded-[3rem] p-10 text-center">
-                <h3 class="text-xl font-black text-slate-800 uppercase italic mb-8">Resumo da Chamada</h3>
-                <div class="grid grid-cols-3 gap-2 mb-8">
-                    <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-                        <p class="text-[8px] font-black text-emerald-600 uppercase">Pres.</p>
-                        <p id="totalPresentes" class="text-2xl font-black text-emerald-700">0</p>
-                    </div>
-                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100">
-                        <p class="text-[8px] font-black text-amber-600 uppercase">Just.</p>
-                        <p id="totalJustificados" class="text-2xl font-black text-amber-700">0</p>
-                    </div>
-                    <div class="bg-rose-50 p-4 rounded-2xl border border-rose-100">
-                        <p class="text-[8px] font-black text-rose-600 uppercase">Faltas</p>
-                        <p id="totalFaltas" class="text-2xl font-black text-rose-700">0</p>
-                    </div>
-                </div>
-                <button onclick="baixarRelatorioTXT()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl mb-4 text-[10px] uppercase">Baixar .TXT</button>
-                <button onclick="document.getElementById('modalRelatorio').classList.add('hidden-section')" class="text-slate-400 font-bold text-[10px] uppercase">Voltar</button>
-            </div>
-        </div>
-
     </div>
 
     <script>
@@ -119,7 +99,7 @@
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
         let reuniaoAtivaId = null;
-        let dadosRelatorio = { presentes: [], faltas: [], justificados: [], titulo: "" };
+        let dadosAta = { id: "", titulo: "", data: "", pauta: "", obs: "", presentes: [], faltas: [], justificados: [] };
 
         function fazerLogin() {
             if (document.getElementById('adminPass').value === "admin123") {
@@ -129,82 +109,66 @@
             } else alert("Senha incorreta!");
         }
 
-        async function cadastrarFuncionario() {
-            const nome = document.getElementById('novoFuncionario').value.trim();
-            if (!nome) return;
-            const { error } = await supabaseClient.from('funcionarios').insert([{ nome }]);
-            if (!error) { document.getElementById('novoFuncionario').value = ''; carregarFuncionarios(); }
-        }
-
-        // --- NOVA FUNÇÃO: CARREGAR FUNCIONÁRIOS COM CONTADORES ---
         async function carregarFuncionarios() {
             const { data: funcs } = await supabaseClient.from('funcionarios').select('*').order('nome');
             const { data: presencas } = await supabaseClient.from('presencas').select('*');
-
             const lista = document.getElementById('listaFuncionariosCadastrados');
             lista.innerHTML = funcs.map(f => {
-                const pTotal = presencas.filter(p => p.funcionario_id === f.id && p.esteve_presente === true).length;
-                const jTotal = presencas.filter(p => p.funcionario_id === f.id && p.esteve_presente === false && p.justificativa === 'SIM').length;
-                const fTotal = presencas.filter(p => p.funcionario_id === f.id && p.esteve_presente === false && !p.justificativa).length;
-
-                return `
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-md transition-all group">
-                        <div class="flex justify-between items-start mb-3">
-                            <span class="font-bold text-slate-800 text-xs uppercase truncate pr-2">${f.nome}</span>
-                            <button onclick="removerFuncionario('${f.id}')" class="text-slate-200 hover:text-rose-500 font-black text-[8px] opacity-0 group-hover:opacity-100">DELETAR</button>
-                        </div>
-                        <div class="flex gap-2">
-                            <div class="flex-1 bg-emerald-100 text-emerald-700 text-[9px] font-black p-1.5 rounded-lg text-center">P: ${pTotal}</div>
-                            <div class="flex-1 bg-amber-100 text-amber-700 text-[9px] font-black p-1.5 rounded-lg text-center">J: ${jTotal}</div>
-                            <div class="flex-1 bg-rose-100 text-rose-700 text-[9px] font-black p-1.5 rounded-lg text-center">F: ${fTotal}</div>
-                        </div>
+                const p = presencas.filter(x => x.funcionario_id === f.id && x.esteve_presente === true).length;
+                const j = presencas.filter(x => x.funcionario_id === f.id && x.esteve_presente === false && x.justificativa === 'SIM').length;
+                const fl = presencas.filter(x => x.funcionario_id === f.id && x.esteve_presente === false && !x.justificativa).length;
+                return `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-2">
+                    <div class="flex justify-between mb-2"><span class="font-bold text-slate-800 text-[10px] uppercase truncate">${f.nome}</span></div>
+                    <div class="flex gap-1 text-[8px] font-black text-center">
+                        <div class="flex-1 bg-green-100 text-green-700 p-1.5 rounded-lg">P: ${p}</div>
+                        <div class="flex-1 bg-amber-100 text-amber-700 p-1.5 rounded-lg">J: ${j}</div>
+                        <div class="flex-1 bg-red-100 text-red-700 p-1.5 rounded-lg">F: ${fl}</div>
                     </div>
-                `;
+                </div>`;
             }).join('');
-        }
-
-        async function removerFuncionario(id) {
-            if (confirm("Excluir funcionário?")) {
-                await supabaseClient.from('funcionarios').delete().eq('id', id); carregarFuncionarios();
-            }
         }
 
         async function criarReuniao() {
             const t = document.getElementById('tituloReuniao').value;
             const d = document.getElementById('dataReuniao').value;
-            if (!t || !d) return alert("Preencha título e data!");
-            const { error } = await supabaseClient.from('reunioes').insert([{ titulo: t, data_hora: d }]);
-            if (!error) { document.getElementById('tituloReuniao').value = ''; carregarReunioes(); }
+            const p = document.getElementById('pautaReuniao').value;
+            if (!t || !d) return alert("Título e Data obrigatórios.");
+
+            // CORREÇÃO DE FUSO HORÁRIO: Envia como ISO mantendo o fuso do sistema
+            const dataISO = new Date(d).toISOString();
+
+            const { error } = await supabaseClient.from('reunioes').insert([{ titulo: t, data_hora: dataISO, pauta: p }]);
+            if (!error) { location.reload(); }
         }
 
         async function carregarReunioes() {
             const { data } = await supabaseClient.from('reunioes').select('*').order('data_hora', { ascending: false });
             const grid = document.getElementById('gridReunioes');
-            grid.innerHTML = data.map(r => `
-                <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-200 hover:border-blue-500 transition-all cursor-pointer" onclick="abrirChamada('${r.id}', '${r.titulo}', '${r.data_hora}')">
-                    <h3 class="font-black text-slate-800 uppercase italic text-xs mb-1 truncate">${r.titulo}</h3>
-                    <p class="text-slate-400 font-bold text-[8px] uppercase tracking-widest">${new Date(r.data_hora).toLocaleString('pt-BR')}</p>
-                    <div class="mt-4 flex justify-between items-center border-t border-slate-50 pt-3">
-                         <span class="text-[8px] font-black text-blue-500 uppercase tracking-widest">Chamada →</span>
-                         <button onclick="event.stopPropagation(); excluirReuniao('${r.id}')" class="text-slate-200 hover:text-rose-500 font-black text-[8px] uppercase">Apagar</button>
+            grid.innerHTML = data.map(r => {
+                // EXIBIÇÃO CORRIGIDA PARA BRASÍLIA
+                const dataFormatada = new Date(r.data_hora).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+                return `
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 hover:border-blue-500 transition-all cursor-pointer group" onclick="abrirChamada('${r.id}', '${r.titulo}', '${r.data_hora}', \`${r.pauta || ''}\`, \`${r.observacoes || ''}\`)">
+                        <h3 class="font-black text-slate-800 uppercase italic text-xs mb-1 group-hover:text-blue-600 transition">${r.titulo}</h3>
+                        <p class="text-slate-400 font-bold text-[8px] uppercase tracking-widest">${dataFormatada}</p>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        async function abrirChamada(id, titulo, dataHora) {
+        async function abrirChamada(id, titulo, dataRaw, pauta, obs) {
             reuniaoAtivaId = id;
-            dadosRelatorio.titulo = titulo;
+            // DATA PARA O PDF CORRIGIDA
+            const dataLocal = new Date(dataRaw).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+            dadosAta = { id, titulo, data: dataLocal, pauta, obs, presentes: [], faltas: [], justificados: [] };
+            
             document.getElementById('chamadaTitulo').innerText = titulo;
-            document.getElementById('chamadaData').innerText = new Date(dataHora).toLocaleString();
+            document.getElementById('chamadaData').innerText = dataLocal;
+            document.getElementById('obsAta').value = obs;
             document.getElementById('modalChamada').classList.remove('hidden-section');
             
             const { data: todosFunc } = await supabaseClient.from('funcionarios').select('*').order('nome');
-            const { data: pres } = await supabaseClient.from('presencas').select('*').eq('reuniao_id', id);
-
-            dadosRelatorio.presentes = [];
-            dadosRelatorio.faltas = [];
-            dadosRelatorio.justificados = [];
+            const { data: pres = [] } = await supabaseClient.from('presencas').select('*').eq('reuniao_id', id);
 
             const corpo = document.getElementById('corpoChamada');
             corpo.innerHTML = todosFunc.map(f => {
@@ -212,48 +176,95 @@
                 const status = reg ? reg.esteve_presente : null;
                 const justificado = reg ? reg.justificativa : null;
                 
-                if (status === true) dadosRelatorio.presentes.push(f.nome);
-                else if (status === false && justificado) dadosRelatorio.justificados.push(f.nome);
-                else if (status === false) dadosRelatorio.faltas.push(f.nome);
+                if (status === true) dadosAta.presentes.push(f.nome);
+                else if (status === false && justificado) dadosAta.justificados.push(f.nome);
+                else if (status === false) dadosAta.faltas.push(f.nome);
 
-                return `
-                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-transparent hover:bg-slate-100 transition-all gap-2">
-                        <span class="font-bold text-slate-700 text-[10px] uppercase tracking-tight">${f.nome}</span>
-                        <div class="flex gap-1">
-                            <button onclick="marcar('${f.id}', true, false)" class="${status === true ? 'bg-emerald-600 text-white' : 'bg-white text-slate-300'} border px-3 py-1 rounded-xl text-[8px] font-black">P</button>
-                            <button onclick="marcar('${f.id}', false, true)" class="${status === false && justificado ? 'bg-amber-500 text-white' : 'bg-white text-slate-300'} border px-3 py-1 rounded-xl text-[8px] font-black">J</button>
-                            <button onclick="marcar('${f.id}', false, false)" class="${status === false && !justificado ? 'bg-rose-600 text-white' : 'bg-white text-slate-300'} border px-3 py-1 rounded-xl text-[8px] font-black">F</button>
-                        </div>
+                return `<div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 gap-2">
+                    <span class="font-bold text-slate-700 text-[9px] uppercase">${f.nome}</span>
+                    <div class="flex gap-1">
+                        <button onclick="marcar('${f.id}', true, false)" class="${status === true ? 'bg-green-600 text-white shadow-md' : 'bg-white text-slate-300'} border px-3 py-1.5 rounded-xl text-[8px] font-black">P</button>
+                        <button onclick="marcar('${f.id}', false, true)" class="${status === false && justificado ? 'bg-amber-500 text-white shadow-md' : 'bg-white text-slate-300'} border px-3 py-1.5 rounded-xl text-[8px] font-black">J</button>
+                        <button onclick="marcar('${f.id}', false, false)" class="${status === false && !justificado ? 'bg-red-600 text-white shadow-md' : 'bg-white text-slate-300'} border px-3 py-1.5 rounded-xl text-[8px] font-black">F</button>
                     </div>
-                `;
+                </div>`;
             }).join('');
         }
 
-        async function marcar(funcId, estevePresente, ehJustificado) {
+        async function marcar(funcId, status, just) {
             const { data: ex } = await supabaseClient.from('presencas').select('id').eq('reuniao_id', reuniaoAtivaId).eq('funcionario_id', funcId).maybeSingle();
-            const payload = { reuniao_id: reuniaoAtivaId, funcionario_id: funcId, esteve_presente: estevePresente, justificativa: ehJustificado ? "SIM" : null, nome_funcionario: "" };
+            const payload = { reuniao_id: reuniaoAtivaId, funcionario_id: funcId, esteve_presente: status, justificativa: just ? "SIM" : null, nome_funcionario: "" };
             if (ex) await supabaseClient.from('presencas').update(payload).eq('id', ex.id);
             else await supabaseClient.from('presencas').insert([payload]);
-            abrirChamada(reuniaoAtivaId, dadosRelatorio.titulo, document.getElementById('chamadaData').innerText);
-            carregarFuncionarios(); // Atualiza contadores na lateral em tempo real
+            
+            const rawData = dadosAta.data; // Mantém a data local já formatada
+            abrirChamada(reuniaoAtivaId, dadosAta.titulo, rawData, dadosAta.pauta, document.getElementById('obsAta').value);
+            carregarFuncionarios();
         }
 
-        function gerarRelatorio() {
-            document.getElementById('totalPresentes').innerText = dadosRelatorio.presentes.length;
-            document.getElementById('totalJustificados').innerText = dadosRelatorio.justificados.length;
-            document.getElementById('totalFaltas').innerText = dadosRelatorio.faltas.length;
-            document.getElementById('modalRelatorio').classList.remove('hidden-section');
+        async function salvarObsTemporaria() {
+            const novaObs = document.getElementById('obsAta').value;
+            await supabaseClient.from('reunioes').update({ observacoes: novaObs }).eq('id', reuniaoAtivaId);
         }
 
-        function baixarRelatorioTXT() {
-            const texto = `RELATÓRIO DE PRESENÇA\n${dadosRelatorio.titulo.toUpperCase()}\nDATA: ${document.getElementById('chamadaData').innerText}\n\nPRESENTES (${dadosRelatorio.presentes.length}):\n${dadosRelatorio.presentes.join('\n')}\n\nJUSTIFICADOS (${dadosRelatorio.justificados.length}):\n${dadosRelatorio.justificados.join('\n')}\n\nFALTAS (${dadosRelatorio.faltas.length}):\n${dadosRelatorio.faltas.join('\n')}`;
-            const blob = new Blob([texto], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `relatorio_${dadosRelatorio.titulo}.txt`; a.click();
+        function gerarRelatorioPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const margem = 20;
+            let y = 20;
+
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("ATA DE REUNIÃO", margem, y);
+            y += 15;
+
+            doc.setFontSize(12);
+            doc.text(`TÍTULO: ${dadosAta.titulo.toUpperCase()}`, margem, y);
+            y += 7;
+            // DATA NO PDF AGORA ESTÁ 100% CORRETA
+            doc.text(`DATA/HORA: ${dadosAta.data}`, margem, y);
+            y += 15;
+
+            doc.setFontSize(14);
+            doc.text("PAUTA / TÓPICOS INICIAIS:", margem, y);
+            y += 7;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            const pautaLinhas = doc.splitTextToSize(dadosAta.pauta || "Nenhuma pauta definida.", 170);
+            doc.text(pautaLinhas, margem, y);
+            y += (pautaLinhas.length * 7) + 10;
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text("DEBATES E DECISÕES:", margem, y);
+            y += 7;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            const obsLinhas = doc.splitTextToSize(document.getElementById('obsAta').value || "Sem observações.", 170);
+            doc.text(obsLinhas, margem, y);
+            y += (obsLinhas.length * 7) + 15;
+
+            doc.setFont("helvetica", "bold");
+            doc.text("LISTA DE PRESENÇA:", margem, y);
+            y += 7;
+            doc.setFontSize(10);
+            doc.text(`PRESENTES: ${dadosAta.presentes.join(", ") || "Nenhum"}`, margem, y, { maxWidth: 170 });
+            y += 12;
+            doc.text(`JUSTIFICADOS: ${dadosAta.justificados.join(", ") || "Nenhum"}`, margem, y, { maxWidth: 170 });
+            y += 10;
+            doc.text(`FALTAS: ${dadosAta.faltas.join(", ") || "Nenhum"}`, margem, y, { maxWidth: 170 });
+
+            doc.save(`ata_${dadosAta.titulo.replace(/\s+/g, '_')}.pdf`);
         }
 
-        function fecharModal() { document.getElementById('modalChamada').classList.add('hidden-section'); }
-        async function excluirReuniao(id) { if (confirm("Apagar reunião?")) { await supabaseClient.from('reunioes').delete().eq('id', id); carregarReunioes(); carregarFuncionarios(); } }
+        async function cadastrarFuncionario() {
+            const nome = document.getElementById('novoFuncionario').value.trim();
+            if (!nome) return;
+            const { error } = await supabaseClient.from('funcionarios').insert([{ nome }]);
+            if (!error) { document.getElementById('novoFuncionario').value = ''; carregarFuncionarios(); }
+        }
+
+        function fecharModal() { document.getElementById('modalChamada').classList.add('hidden-section'); carregarReunioes(); }
     </script>
 </body>
 </html>
