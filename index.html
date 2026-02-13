@@ -71,7 +71,7 @@
                         <h3 id="chamadaTitulo" class="text-xl font-black text-slate-800 uppercase italic">---</h3>
                         <p id="chamadaData" class="text-blue-500 font-bold text-[9px] mt-1 uppercase tracking-widest"></p>
                     </div>
-                    <button onclick="fecharModal()" class="text-slate-300 hover:text-red-500 font-black">×</button>
+                    <button onclick="fecharModal()" class="text-slate-300 hover:text-red-500 font-black text-xl">×</button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto pr-2 custom-scroll">
@@ -117,8 +117,9 @@
                 const p = presencas.filter(x => x.funcionario_id === f.id && x.esteve_presente === true).length;
                 const j = presencas.filter(x => x.funcionario_id === f.id && x.esteve_presente === false && x.justificativa === 'SIM').length;
                 const fl = presencas.filter(x => x.funcionario_id === f.id && x.esteve_presente === false && !x.justificativa).length;
-                return `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-2">
-                    <div class="flex justify-between mb-2"><span class="font-bold text-slate-800 text-[10px] uppercase truncate">${f.nome}</span></div>
+                return `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-2 relative">
+                    <button onclick="removerFuncionario('${f.id}')" class="absolute top-2 right-2 text-red-400 hover:text-red-600 font-bold text-[10px]">EXCLUIR</button>
+                    <div class="flex flex-col mb-2"><span class="font-bold text-slate-800 text-[10px] uppercase truncate w-3/4">${f.nome}</span></div>
                     <div class="flex gap-1 text-[8px] font-black text-center">
                         <div class="flex-1 bg-green-100 text-green-700 p-1.5 rounded-lg">P: ${p}</div>
                         <div class="flex-1 bg-amber-100 text-amber-700 p-1.5 rounded-lg">J: ${j}</div>
@@ -128,15 +129,26 @@
             }).join('');
         }
 
+        async function removerFuncionario(id) {
+            if (confirm("Deseja realmente excluir este funcionário? Isso apagará o histórico dele.")) {
+                await supabaseClient.from('funcionarios').delete().eq('id', id);
+                carregarFuncionarios();
+            }
+        }
+
+        async function excluirReuniao(id) {
+            if (confirm("Tem certeza que deseja apagar esta reunião permanentemente?")) {
+                await supabaseClient.from('reunioes').delete().eq('id', id);
+                carregarReunioes();
+            }
+        }
+
         async function criarReuniao() {
             const t = document.getElementById('tituloReuniao').value;
             const d = document.getElementById('dataReuniao').value;
             const p = document.getElementById('pautaReuniao').value;
             if (!t || !d) return alert("Título e Data obrigatórios.");
-
-            // CORREÇÃO DE FUSO HORÁRIO: Envia como ISO mantendo o fuso do sistema
             const dataISO = new Date(d).toISOString();
-
             const { error } = await supabaseClient.from('reunioes').insert([{ titulo: t, data_hora: dataISO, pauta: p }]);
             if (!error) { location.reload(); }
         }
@@ -145,11 +157,11 @@
             const { data } = await supabaseClient.from('reunioes').select('*').order('data_hora', { ascending: false });
             const grid = document.getElementById('gridReunioes');
             grid.innerHTML = data.map(r => {
-                // EXIBIÇÃO CORRIGIDA PARA BRASÍLIA
                 const dataFormatada = new Date(r.data_hora).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
                 return `
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 hover:border-blue-500 transition-all cursor-pointer group" onclick="abrirChamada('${r.id}', '${r.titulo}', '${r.data_hora}', \`${r.pauta || ''}\`, \`${r.observacoes || ''}\`)">
-                        <h3 class="font-black text-slate-800 uppercase italic text-xs mb-1 group-hover:text-blue-600 transition">${r.titulo}</h3>
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 hover:border-blue-500 transition-all cursor-pointer relative group" onclick="abrirChamada('${r.id}', '${r.titulo}', '${r.data_hora}', \`${r.pauta || ''}\`, \`${r.observacoes || ''}\`)">
+                        <button onclick="event.stopPropagation(); excluirReuniao('${r.id}')" class="absolute top-4 right-4 text-red-400 hover:text-red-600 font-bold text-[9px] z-10">APAGAR</button>
+                        <h3 class="font-black text-slate-800 uppercase italic text-xs mb-1 group-hover:text-blue-600 transition w-3/4">${r.titulo}</h3>
                         <p class="text-slate-400 font-bold text-[8px] uppercase tracking-widest">${dataFormatada}</p>
                     </div>
                 `;
@@ -158,28 +170,22 @@
 
         async function abrirChamada(id, titulo, dataRaw, pauta, obs) {
             reuniaoAtivaId = id;
-            // DATA PARA O PDF CORRIGIDA
             const dataLocal = new Date(dataRaw).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
             dadosAta = { id, titulo, data: dataLocal, pauta, obs, presentes: [], faltas: [], justificados: [] };
-            
             document.getElementById('chamadaTitulo').innerText = titulo;
             document.getElementById('chamadaData').innerText = dataLocal;
             document.getElementById('obsAta').value = obs;
             document.getElementById('modalChamada').classList.remove('hidden-section');
-            
             const { data: todosFunc } = await supabaseClient.from('funcionarios').select('*').order('nome');
             const { data: pres = [] } = await supabaseClient.from('presencas').select('*').eq('reuniao_id', id);
-
             const corpo = document.getElementById('corpoChamada');
             corpo.innerHTML = todosFunc.map(f => {
                 const reg = pres.find(p => p.funcionario_id === f.id);
                 const status = reg ? reg.esteve_presente : null;
                 const justificado = reg ? reg.justificativa : null;
-                
                 if (status === true) dadosAta.presentes.push(f.nome);
                 else if (status === false && justificado) dadosAta.justificados.push(f.nome);
                 else if (status === false) dadosAta.faltas.push(f.nome);
-
                 return `<div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 gap-2">
                     <span class="font-bold text-slate-700 text-[9px] uppercase">${f.nome}</span>
                     <div class="flex gap-1">
@@ -196,9 +202,7 @@
             const payload = { reuniao_id: reuniaoAtivaId, funcionario_id: funcId, esteve_presente: status, justificativa: just ? "SIM" : null, nome_funcionario: "" };
             if (ex) await supabaseClient.from('presencas').update(payload).eq('id', ex.id);
             else await supabaseClient.from('presencas').insert([payload]);
-            
-            const rawData = dadosAta.data; // Mantém a data local já formatada
-            abrirChamada(reuniaoAtivaId, dadosAta.titulo, rawData, dadosAta.pauta, document.getElementById('obsAta').value);
+            abrirChamada(reuniaoAtivaId, dadosAta.titulo, dadosAta.data, dadosAta.pauta, document.getElementById('obsAta').value);
             carregarFuncionarios();
         }
 
@@ -212,48 +216,19 @@
             const doc = new jsPDF();
             const margem = 20;
             let y = 20;
-
-            doc.setFontSize(22);
-            doc.setFont("helvetica", "bold");
-            doc.text("ATA DE REUNIÃO", margem, y);
-            y += 15;
-
-            doc.setFontSize(12);
-            doc.text(`TÍTULO: ${dadosAta.titulo.toUpperCase()}`, margem, y);
-            y += 7;
-            // DATA NO PDF AGORA ESTÁ 100% CORRETA
-            doc.text(`DATA/HORA: ${dadosAta.data}`, margem, y);
-            y += 15;
-
-            doc.setFontSize(14);
-            doc.text("PAUTA / TÓPICOS INICIAIS:", margem, y);
-            y += 7;
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(11);
-            const pautaLinhas = doc.splitTextToSize(dadosAta.pauta || "Nenhuma pauta definida.", 170);
-            doc.text(pautaLinhas, margem, y);
-            y += (pautaLinhas.length * 7) + 10;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.text("DEBATES E DECISÕES:", margem, y);
-            y += 7;
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(11);
-            const obsLinhas = doc.splitTextToSize(document.getElementById('obsAta').value || "Sem observações.", 170);
-            doc.text(obsLinhas, margem, y);
-            y += (obsLinhas.length * 7) + 15;
-
-            doc.setFont("helvetica", "bold");
-            doc.text("LISTA DE PRESENÇA:", margem, y);
-            y += 7;
-            doc.setFontSize(10);
-            doc.text(`PRESENTES: ${dadosAta.presentes.join(", ") || "Nenhum"}`, margem, y, { maxWidth: 170 });
-            y += 12;
-            doc.text(`JUSTIFICADOS: ${dadosAta.justificados.join(", ") || "Nenhum"}`, margem, y, { maxWidth: 170 });
-            y += 10;
+            doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("ATA DE REUNIÃO", margem, y); y += 15;
+            doc.setFontSize(12); doc.text(`TÍTULO: ${dadosAta.titulo.toUpperCase()}`, margem, y); y += 7;
+            doc.text(`DATA/HORA: ${dadosAta.data}`, margem, y); y += 15;
+            doc.setFontSize(14); doc.text("PAUTA / TÓPICOS INICIAIS:", margem, y); y += 7;
+            doc.setFont("helvetica", "normal"); doc.setFontSize(11);
+            const pautaLinhas = doc.splitTextToSize(dadosAta.pauta || "Nenhuma pauta definida.", 170); doc.text(pautaLinhas, margem, y); y += (pautaLinhas.length * 7) + 10;
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.text("DEBATES E DECISÕES:", margem, y); y += 7;
+            doc.setFont("helvetica", "normal"); doc.setFontSize(11);
+            const obsLinhas = doc.splitTextToSize(document.getElementById('obsAta').value || "Sem observações.", 170); doc.text(obsLinhas, margem, y); y += (obsLinhas.length * 7) + 15;
+            doc.setFont("helvetica", "bold"); doc.text("LISTA DE PRESENÇA:", margem, y); y += 7;
+            doc.setFontSize(10); doc.text(`PRESENTES: ${dadosAta.presentes.join(", ") || "Nenhum"}`, margem, y, { maxWidth: 170 }); y += 12;
+            doc.text(`JUSTIFICADOS: ${dadosAta.justificados.join(", ") || "Nenhum"}`, margem, y, { maxWidth: 170 }); y += 10;
             doc.text(`FALTAS: ${dadosAta.faltas.join(", ") || "Nenhum"}`, margem, y, { maxWidth: 170 });
-
             doc.save(`ata_${dadosAta.titulo.replace(/\s+/g, '_')}.pdf`);
         }
 
