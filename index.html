@@ -21,7 +21,7 @@
         <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-blue-100 max-w-sm w-full text-center border border-white">
             <h1 class="text-xl font-extrabold mb-8 uppercase italic tracking-tight text-blue-600">Painel Administrativo</h1>
             <input type="password" id="adminPass" placeholder="Senha de Acesso" class="w-full bg-slate-50 border-2 border-slate-100 focus:border-blue-600 p-4 rounded-2xl mb-4 outline-none text-center font-bold">
-            <button onclick="fazerLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition shadow-lg uppercase text-xs">Acessar Painel</button>
+            <button onclick="fazerLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition shadow-lg uppercase text-xs">Entrar no Sistema</button>
         </div>
     </div>
 
@@ -36,6 +36,7 @@
                 <button onclick="abaAtiva('mensagens'); carregarMensagens();" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-slate-100 text-slate-600 hover:bg-blue-50 relative">
                     Mensagens <span id="badgeMensagem" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-bounce"></span>
                 </button>
+                <button onclick="abaAtiva('feedbacks'); carregarFeedbacks();" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-slate-100 text-slate-600 hover:bg-blue-50">Feedbacks</button>
                 <button onclick="window.location.reload()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold text-[10px] uppercase">Sair</button>
             </div>
         </header>
@@ -58,10 +59,10 @@
                 <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200">
                     <h2 class="font-extrabold text-slate-800 uppercase text-[10px] mb-6 italic tracking-widest flex items-center gap-2">📅 Criar Chamada</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <input type="text" id="tituloReuniao" placeholder="Título" class="border-2 border-slate-50 p-4 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-sm">
-                        <input type="datetime-local" id="dataReuniao" class="border-2 border-slate-50 p-4 rounded-2xl outline-none focus:border-blue-600 bg-slate-50 text-sm">
+                        <input type="text" id="tituloReuniao" placeholder="Título" class="border-2 border-slate-50 p-4 rounded-2xl outline-none text-sm">
+                        <input type="datetime-local" id="dataReuniao" class="border-2 border-slate-50 p-4 rounded-2xl outline-none text-sm">
                     </div>
-                    <button onclick="criarReuniao()" class="w-full bg-[#1e293b] text-white font-black py-4 rounded-2xl hover:bg-black transition shadow-xl uppercase text-xs tracking-widest">Lançar Chamada</button>
+                    <button onclick="criarReuniao()" class="w-full bg-[#1e293b] text-white font-black py-4 rounded-2xl shadow-xl uppercase text-xs tracking-widest">Lançar Chamada</button>
                 </div>
                 <div id="gridReunioes" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
@@ -71,9 +72,19 @@
             <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200">
                 <div class="flex justify-between items-center mb-8">
                     <h2 class="font-extrabold text-slate-800 uppercase text-[10px] italic tracking-widest">📥 Mensagens</h2>
-                    <button onclick="carregarMensagens()" class="text-[9px] font-black text-blue-600 uppercase">Atualizar ↻</button>
+                    <button onclick="carregarMensagens()" class="text-[9px] font-black text-blue-600 uppercase hover:underline">Atualizar ↻</button>
                 </div>
                 <div id="containerMensagens" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <div id="section-feedbacks" class="hidden-section max-w-4xl mx-auto">
+            <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="font-extrabold text-slate-800 uppercase text-[10px] italic tracking-widest">⭐ Feedbacks</h2>
+                    <button onclick="carregarFeedbacks()" class="text-[9px] font-black text-blue-600 uppercase hover:underline">Atualizar ↻</button>
+                </div>
+                <div id="containerFeedbacks" class="space-y-4"></div>
             </div>
         </div>
 
@@ -109,8 +120,7 @@
         let dadosAta = { id: "", titulo: "", data: "", obs: "", presentes: [], faltas: [], justificados: [] };
 
         function abaAtiva(aba) {
-            document.getElementById('section-dashboard').classList.add('hidden-section');
-            document.getElementById('section-mensagens').classList.add('hidden-section');
+            ['dashboard', 'mensagens', 'feedbacks'].forEach(a => document.getElementById('section-' + a).classList.add('hidden-section'));
             document.getElementById('section-' + aba).classList.remove('hidden-section');
         }
 
@@ -123,19 +133,32 @@
             } else alert("Senha incorreta!");
         }
 
+        // RESTAURAÇÃO: Detalhes de P, J, F e Percentagem
         async function carregarFuncionarios() {
             const { data: funcs } = await supabaseClient.from('funcionarios').select('*').order('nome');
             const { data: reunioes } = await supabaseClient.from('reunioes').select('id');
             const { data: pres } = await supabaseClient.from('presencas').select('*');
             const totalR = reunioes ? reunioes.length : 0;
+
             document.getElementById('listaFuncionariosCadastrados').innerHTML = funcs.map(f => {
                 const p = pres.filter(x => x.funcionario_id === f.id && x.esteve_presente).length;
                 const j = pres.filter(x => x.funcionario_id === f.id && !x.esteve_presente && x.justificativa && x.justificativa !== "NÃO").length;
                 const fl = pres.filter(x => x.funcionario_id === f.id && !x.esteve_presente && (!x.justificativa || x.justificativa === "NÃO")).length;
                 const freq = totalR > 0 ? ((p / totalR) * 100).toFixed(0) : 0;
-                return `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-2">
-                    <div class="flex justify-between items-start mb-2"><div class="flex flex-col"><span class="font-bold text-slate-800 text-[10px] uppercase pr-12">${f.nome}</span><span class="text-blue-600 text-[8px] font-black uppercase mt-1">Freq: ${freq}%</span></div><button onclick="removerFuncionario('${f.id}')" class="text-red-400 font-bold text-[8px]">EXCLUIR</button></div>
-                    <div class="flex gap-1 text-[7px] font-black text-center"><div class="flex-1 bg-green-100 text-green-700 p-1.5 rounded-lg">P: ${p}</div><div class="flex-1 bg-amber-100 text-amber-700 p-1.5 rounded-lg">J: ${j}</div><div class="flex-1 bg-red-100 text-red-700 p-1.5 rounded-lg">F: ${fl}</div></div>
+
+                return `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-2 relative">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex flex-col flex-1 truncate">
+                            <span class="font-bold text-slate-800 text-[10px] uppercase truncate block pr-12">${f.nome}</span>
+                            <span class="text-blue-600 text-[8px] font-black uppercase mt-1">Frequência: ${freq}%</span>
+                        </div>
+                        <button onclick="removerFuncionario('${f.id}')" class="text-red-400 hover:text-red-600 font-bold text-[8px] whitespace-nowrap">EXCLUIR</button>
+                    </div>
+                    <div class="flex gap-1 text-[7px] font-black text-center">
+                        <div class="flex-1 bg-green-100 text-green-700 p-1.5 rounded-lg border border-green-100">P: ${p}</div>
+                        <div class="flex-1 bg-amber-100 text-amber-700 p-1.5 rounded-lg border border-amber-100">J: ${j}</div>
+                        <div class="flex-1 bg-red-100 text-red-700 p-1.5 rounded-lg border border-red-100">F: ${fl}</div>
+                    </div>
                 </div>`;
             }).join('');
         }
@@ -143,67 +166,39 @@
         async function carregarReunioes() {
             const { data } = await supabaseClient.from('reunioes').select('*').order('data_hora', { ascending: false });
             document.getElementById('gridReunioes').innerHTML = data.map(r => `
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 cursor-pointer relative" onclick="abrirChamada('${r.id}', '${r.titulo}', '${r.data_hora}', \`${r.observacoes || ''}\`)">
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 hover:border-blue-500 cursor-pointer relative" onclick="abrirChamada('${r.id}', '${r.titulo}', '${r.data_hora}', \`${r.observacoes || ''}\`)">
                     <button onclick="event.stopPropagation(); excluirReuniao('${r.id}')" class="absolute top-4 right-4 text-red-200 hover:text-red-500 font-bold text-[8px]">APAGAR</button>
-                    <h3 class="font-black text-slate-800 uppercase italic text-xs mb-1">${r.titulo}</h3><p class="text-slate-400 font-bold text-[8px] uppercase tracking-widest">${new Date(r.data_hora).toLocaleString('pt-BR')}</p>
+                    <h3 class="font-black text-slate-800 uppercase italic text-xs mb-1">${r.titulo}</h3>
+                    <p class="text-slate-400 font-bold text-[8px] uppercase tracking-widest">${new Date(r.data_hora).toLocaleString('pt-BR')}</p>
                 </div>`).join('');
         }
 
-        async function carregarMensagens() {
-            const container = document.getElementById('containerMensagens');
-            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-10 animate-pulse">Buscando mensagens...</p>';
-            const { data, error } = await supabaseClient.from('mensagens').select('*').order('created_at', { ascending: false });
-            if (data && data.length > 0) {
-                container.innerHTML = data.map(m => `
-                    <div class="p-6 rounded-3xl border ${m.lida ? 'bg-slate-50 opacity-60' : 'bg-white border-blue-100 shadow-md border-l-4 border-l-blue-600'}">
-                        <div class="flex justify-between items-start mb-3">
-                            <div><h4 class="font-black text-slate-800 text-[10px] uppercase">${m.nome}</h4><span class="text-[7px] font-bold text-slate-400 italic">${new Date(m.created_at).toLocaleString('pt-BR')}</span></div>
-                            <div class="flex gap-2">
-                                ${!m.lida ? `<button onclick="marcarLida('${m.id}')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase">Lida</button>` : ''}
-                                <button onclick="excluirMensagem('${m.id}')" class="bg-red-50 text-red-600 px-3 py-1 rounded-lg text-[8px] font-black uppercase hover:bg-red-500 hover:text-white transition">Excluir</button>
-                            </div>
-                        </div>
-                        <p class="text-[11px] text-slate-700 font-medium">${m.conteudo}</p>
-                    </div>`).join('');
-            } else container.innerHTML = '<p class="text-xs text-slate-400 text-center py-10 italic">Nenhuma mensagem.</p>';
-        }
-
-        async function excluirMensagem(id) {
-            if(confirm("Apagar permanentemente?")) {
-                const { error } = await supabaseClient.from('mensagens').delete().eq('id', id);
-                if(error) alert("ERRO AO EXCLUIR: " + error.message);
-                else { carregarMensagens(); checarMensagensNovas(); }
-            }
-        }
-
-        async function marcarLida(id) { await supabaseClient.from('mensagens').update({ lida: true }).eq('id', id); carregarMensagens(); checarMensagensNovas(); }
-        async function checarMensagensNovas() {
-            const { data } = await supabaseClient.from('mensagens').select('id').eq('lida', false);
-            const badge = document.getElementById('badgeMensagem');
-            if (data && data.length > 0) badge.classList.remove('hidden'); else badge.classList.add('hidden');
-        }
-
-        // Funções auxiliares mantidas
-        async function cadastrarFuncionario() { const n = document.getElementById('novoFuncionario').value.trim(); if(n) await supabaseClient.from('funcionarios').insert([{ nome: n }]); document.getElementById('novoFuncionario').value = ''; carregarFuncionarios(); }
-        async function criarReuniao() { const t = document.getElementById('tituloReuniao').value; const d = document.getElementById('dataReuniao').value; if(t && d) await supabaseClient.from('reunioes').insert([{ titulo: t, data_hora: new Date(d).toISOString() }]); carregarReunioes(); }
-        async function removerFuncionario(id) { if(confirm("Excluir?")) { await supabaseClient.from('funcionarios').delete().eq('id', id); carregarFuncionarios(); } }
-        async function excluirReuniao(id) { if(confirm("Apagar?")) { await supabaseClient.from('reunioes').delete().eq('id', id); carregarReunioes(); } }
-        function abaAtiva(aba) { document.getElementById('section-dashboard').classList.add('hidden-section'); document.getElementById('section-mensagens').classList.add('hidden-section'); document.getElementById('section-' + aba).classList.remove('hidden-section'); }
-        function fecharModal() { document.getElementById('modalChamada').classList.add('hidden-section'); carregarFuncionarios(); }
-        
-        // Abrir Chamada (Restaurada P, J, F)
+        // RESTAURAÇÃO: Chamada com P, J (Prompt) e F
         async function abrirChamada(id, titulo, dataRaw, obs = "") {
-            reuniaoAtivaId = id; dadosAta = { id, titulo, data: new Date(dataRaw).toLocaleString('pt-BR'), obs, presentes: [], faltas: [], justificados: [] };
-            document.getElementById('chamadaTitulo').innerText = titulo; document.getElementById('chamadaData').innerText = dadosAta.data;
-            document.getElementById('obsAta').value = obs; document.getElementById('modalChamada').classList.remove('hidden-section');
+            reuniaoAtivaId = id;
+            dadosAta = { id, titulo, data: new Date(dataRaw).toLocaleString('pt-BR'), obs, presentes: [], faltas: [], justificados: [] };
+            document.getElementById('chamadaTitulo').innerText = titulo;
+            document.getElementById('chamadaData').innerText = dadosAta.data;
+            document.getElementById('obsAta').value = obs;
+            document.getElementById('modalChamada').classList.remove('hidden-section');
+
             const { data: func } = await supabaseClient.from('funcionarios').select('*').order('nome');
             const { data: pres = [] } = await supabaseClient.from('presencas').select('*').eq('reuniao_id', id);
+
             document.getElementById('corpoChamada').innerHTML = func.map(f => {
                 const r = pres.find(p => p.funcionario_id === f.id);
-                const s = r ? r.esteve_presente : null; const j = r ? r.justificativa : null;
-                if (s === true) dadosAta.presentes.push(f.nome); else if (s === false && j && j !== "NÃO") dadosAta.justificados.push(`${f.nome} (${j})`); else if (s === false) dadosAta.faltas.push(f.nome);
+                const s = r ? r.esteve_presente : null;
+                const j = r ? r.justificativa : null;
+
+                if (s === true) dadosAta.presentes.push(f.nome);
+                else if (s === false && j && j !== "NÃO") dadosAta.justificados.push(`${f.nome} (${j})`);
+                else if (s === false) dadosAta.faltas.push(f.nome);
+
                 return `<div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <div class="flex flex-col truncate pr-2"><span class="font-bold text-slate-700 text-[9px] uppercase">${f.nome}</span>${s === false && j && j !== "NÃO" ? `<span class="text-[7px] text-amber-600 font-bold italic">${j}</span>` : ''}</div>
+                    <div class="flex flex-col truncate pr-2">
+                        <span class="font-bold text-slate-700 text-[9px] uppercase">${f.nome}</span>
+                        ${s === false && j && j !== "NÃO" ? `<span class="text-[7px] text-amber-600 font-bold italic">${j}</span>` : ''}
+                    </div>
                     <div class="flex gap-1">
                         <button onclick="marcar('${f.id}', true, false)" class="${s === true ? 'bg-green-600 text-white' : 'bg-white text-slate-300'} border px-3 py-1.5 rounded-xl text-[8px] font-black">P</button>
                         <button onclick="marcar('${f.id}', false, true)" class="${s === false && (j && j !== "NÃO") ? 'bg-amber-500 text-white' : 'bg-white text-slate-300'} border px-3 py-1.5 rounded-xl text-[8px] font-black">J</button>
@@ -211,18 +206,75 @@
                     </div>
                 </div>`;
             }).join('');
-            document.getElementById('countP').innerText = dadosAta.presentes.length; document.getElementById('countJ').innerText = dadosAta.justificados.length; document.getElementById('countF').innerText = dadosAta.faltas.length;
+            document.getElementById('countP').innerText = dadosAta.presentes.length;
+            document.getElementById('countJ').innerText = dadosAta.justificados.length;
+            document.getElementById('countF').innerText = dadosAta.faltas.length;
         }
 
         async function marcar(fid, s, j) {
-            let just = null; if(j) { just = prompt("Motivo:"); if(!just) return; }
+            let just = null;
+            if(j) { just = prompt("Motivo da Justificativa:"); if(!just) return; }
             const p = { reuniao_id: reuniaoAtivaId, funcionario_id: fid, esteve_presente: s, justificativa: just || (s === false && !j ? "NÃO" : null) };
             const { data: ex } = await supabaseClient.from('presencas').select('id').eq('reuniao_id', reuniaoAtivaId).eq('funcionario_id', fid).maybeSingle();
-            if (ex) await supabaseClient.from('presencas').update(p).eq('id', ex.id); else await supabaseClient.from('presencas').insert([p]);
+            if (ex) await supabaseClient.from('presencas').update(p).eq('id', ex.id);
+            else await supabaseClient.from('presencas').insert([p]);
             abrirChamada(reuniaoAtivaId, dadosAta.titulo, dadosAta.data, document.getElementById('obsAta').value);
+            carregarFuncionarios();
         }
-        
+
+        // OUTRAS FUNÇÕES (MENSAGENS/FEEDBACKS/CRIAÇÃO)
+        async function carregarMensagens() {
+            const { data } = await supabaseClient.from('mensagens').select('*').order('created_at', { ascending: false });
+            document.getElementById('containerMensagens').innerHTML = data.map(m => `
+                <div class="p-6 rounded-3xl border ${m.lida ? 'bg-slate-50 opacity-60' : 'bg-white border-blue-100 shadow-md border-l-4 border-l-blue-600'}">
+                    <div class="flex justify-between items-start mb-3">
+                        <div><h4 class="font-black text-slate-800 text-[10px] uppercase">${m.nome}</h4><span class="text-[7px] font-bold text-slate-400 italic">${new Date(m.created_at).toLocaleString('pt-BR')}</span></div>
+                        <div class="flex gap-2">
+                            ${!m.lida ? `<button onclick="marcarLida('${m.id}')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase">Lida</button>` : ''}
+                            <button onclick="excluirMensagem('${m.id}')" class="text-red-400 font-bold text-[8px] uppercase">Excluir</button>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-700 font-medium">${m.conteudo}</p>
+                </div>`).join('') || '<p class="text-xs text-slate-400 italic">Sem mensagens.</p>';
+        }
+
+        async function carregarFeedbacks() {
+            const { data } = await supabaseClient.from('avaliacoes_reuniao').select('*, reunioes(titulo)').order('created_at', { ascending: false });
+            document.getElementById('containerFeedbacks').innerHTML = data.map(f => `
+                <div class="p-6 rounded-3xl border border-slate-100 bg-white">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[9px] font-black text-blue-600 uppercase italic">${f.reunioes ? f.reunioes.titulo : 'REUNIÃO APAGADA'}</span>
+                        <button onclick="excluirFeedback('${f.id}')" class="text-red-400 font-bold text-[8px] uppercase">Apagar</button>
+                    </div>
+                    <p class="text-xs text-slate-700 font-medium mb-3">"${f.comentario}"</p>
+                    <div class="text-amber-400 text-xs">${'★'.repeat(f.nota)}${'☆'.repeat(5-f.nota)}</div>
+                </div>`).join('') || '<p class="text-xs text-slate-400 italic">Sem feedbacks.</p>';
+        }
+
+        async function criarReuniao() {
+            const t = document.getElementById('tituloReuniao').value;
+            const d = document.getElementById('dataReuniao').value;
+            if (t && d) {
+                await supabaseClient.from('reunioes').insert([{ titulo: t, data_hora: new Date(d).toISOString() }]);
+                document.getElementById('tituloReuniao').value = ''; document.getElementById('dataReuniao').value = '';
+                carregarReunioes(); carregarFuncionarios();
+            }
+        }
+
+        async function excluirReuniao(id) { if(confirm("Apagar chamada?")) { await supabaseClient.from('reunioes').delete().eq('id', id); carregarReunioes(); carregarFuncionarios(); } }
+        async function excluirMensagem(id) { if(confirm("Apagar?")) { await supabaseClient.from('mensagens').delete().eq('id', id); carregarMensagens(); checarMensagensNovas(); } }
+        async function excluirFeedback(id) { if(confirm("Apagar?")) { await supabaseClient.from('avaliacoes_reuniao').delete().eq('id', id); carregarFeedbacks(); } }
+        async function marcarLida(id) { await supabaseClient.from('mensagens').update({ lida: true }).eq('id', id); carregarMensagens(); checarMensagensNovas(); }
+        async function checarMensagensNovas() {
+            const { data } = await supabaseClient.from('mensagens').select('id').eq('lida', false);
+            const b = document.getElementById('badgeMensagem');
+            if (data && data.length > 0) b.classList.remove('hidden'); else b.classList.add('hidden');
+        }
+        async function cadastrarFuncionario() { const n = document.getElementById('novoFuncionario').value.trim(); if(n) await supabaseClient.from('funcionarios').insert([{ nome: n }]); document.getElementById('novoFuncionario').value = ''; carregarFuncionarios(); }
+        async function removerFuncionario(id) { if(confirm("Remover?")) { await supabaseClient.from('funcionarios').delete().eq('id', id); carregarFuncionarios(); } }
         async function salvarObsTemporaria() { await supabaseClient.from('reunioes').update({ observacoes: document.getElementById('obsAta').value }).eq('id', reuniaoAtivaId); }
+        function fecharModal() { document.getElementById('modalChamada').classList.add('hidden-section'); carregarFuncionarios(); }
+        function gerarRelatorioPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.text(`Ata: ${dadosAta.titulo}`, 20, 20); doc.save('Ata.pdf'); }
     </script>
 </body>
 </html>
