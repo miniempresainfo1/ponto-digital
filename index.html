@@ -133,7 +133,6 @@
             } else alert("Senha incorreta!");
         }
 
-        // RESTAURAÇÃO: Detalhes de P, J, F e Percentagem
         async function carregarFuncionarios() {
             const { data: funcs } = await supabaseClient.from('funcionarios').select('*').order('nome');
             const { data: reunioes } = await supabaseClient.from('reunioes').select('id');
@@ -165,20 +164,25 @@
 
         async function carregarReunioes() {
             const { data } = await supabaseClient.from('reunioes').select('*').order('data_hora', { ascending: false });
-            document.getElementById('gridReunioes').innerHTML = data.map(r => `
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 hover:border-blue-500 cursor-pointer relative" onclick="abrirChamada('${r.id}', '${r.titulo}', '${r.data_hora}', \`${r.observacoes || ''}\`)">
-                    <button onclick="event.stopPropagation(); excluirReuniao('${r.id}')" class="absolute top-4 right-4 text-red-200 hover:text-red-500 font-bold text-[8px]">APAGAR</button>
-                    <h3 class="font-black text-slate-800 uppercase italic text-xs mb-1">${r.titulo}</h3>
-                    <p class="text-slate-400 font-bold text-[8px] uppercase tracking-widest">${new Date(r.data_hora).toLocaleString('pt-BR')}</p>
-                </div>`).join('');
+            document.getElementById('gridReunioes').innerHTML = data.map(r => {
+                const df = new Date(r.data_hora).toLocaleString('pt-BR');
+                const obsSanitizada = r.observacoes ? r.observacoes.replace(/[`'"]/g, " ") : "";
+                return `
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 hover:border-blue-500 cursor-pointer relative" 
+                         onclick="abrirChamada('${r.id}', '${r.titulo}', '${r.data_hora}', '${obsSanitizada}')">
+                        <button onclick="event.stopPropagation(); excluirReuniao('${r.id}')" class="absolute top-4 right-4 text-red-200 hover:text-red-500 font-bold text-[8px]">APAGAR</button>
+                        <h3 class="font-black text-slate-800 uppercase italic text-xs mb-1">${r.titulo}</h3>
+                        <p class="text-slate-400 font-bold text-[8px] uppercase tracking-widest">${df}</p>
+                    </div>`;
+            }).join('');
         }
 
-        // RESTAURAÇÃO: Chamada com P, J (Prompt) e F
         async function abrirChamada(id, titulo, dataRaw, obs = "") {
             reuniaoAtivaId = id;
-            dadosAta = { id, titulo, data: new Date(dataRaw).toLocaleString('pt-BR'), obs, presentes: [], faltas: [], justificados: [] };
+            const dataLocal = new Date(dataRaw).toLocaleString('pt-BR');
+            dadosAta = { id, titulo, data: dataLocal, obs, presentes: [], faltas: [], justificados: [] };
             document.getElementById('chamadaTitulo').innerText = titulo;
-            document.getElementById('chamadaData').innerText = dadosAta.data;
+            document.getElementById('chamadaData').innerText = dataLocal;
             document.getElementById('obsAta').value = obs;
             document.getElementById('modalChamada').classList.remove('hidden-section');
 
@@ -216,13 +220,21 @@
             if(j) { just = prompt("Motivo da Justificativa:"); if(!just) return; }
             const p = { reuniao_id: reuniaoAtivaId, funcionario_id: fid, esteve_presente: s, justificativa: just || (s === false && !j ? "NÃO" : null) };
             const { data: ex } = await supabaseClient.from('presencas').select('id').eq('reuniao_id', reuniaoAtivaId).eq('funcionario_id', fid).maybeSingle();
+            
             if (ex) await supabaseClient.from('presencas').update(p).eq('id', ex.id);
             else await supabaseClient.from('presencas').insert([p]);
-            abrirChamada(reuniaoAtivaId, dadosAta.titulo, dadosAta.data, document.getElementById('obsAta').value);
+            
+            const textoAtualAta = document.getElementById('obsAta').value;
+            abrirChamada(reuniaoAtivaId, dadosAta.titulo, dadosAta.data, textoAtualAta);
             carregarFuncionarios();
         }
 
-        // OUTRAS FUNÇÕES (MENSAGENS/FEEDBACKS/CRIAÇÃO)
+        async function salvarObsTemporaria() {
+            const textoAta = document.getElementById('obsAta').value;
+            if (!reuniaoAtivaId) return;
+            await supabaseClient.from('reunioes').update({ observacoes: textoAta }).eq('id', reuniaoAtivaId);
+        }
+
         async function carregarMensagens() {
             const { data } = await supabaseClient.from('mensagens').select('*').order('created_at', { ascending: false });
             document.getElementById('containerMensagens').innerHTML = data.map(m => `
@@ -272,7 +284,6 @@
         }
         async function cadastrarFuncionario() { const n = document.getElementById('novoFuncionario').value.trim(); if(n) await supabaseClient.from('funcionarios').insert([{ nome: n }]); document.getElementById('novoFuncionario').value = ''; carregarFuncionarios(); }
         async function removerFuncionario(id) { if(confirm("Remover?")) { await supabaseClient.from('funcionarios').delete().eq('id', id); carregarFuncionarios(); } }
-        async function salvarObsTemporaria() { await supabaseClient.from('reunioes').update({ observacoes: document.getElementById('obsAta').value }).eq('id', reuniaoAtivaId); }
         function fecharModal() { document.getElementById('modalChamada').classList.add('hidden-section'); carregarFuncionarios(); }
         function gerarRelatorioPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.text(`Ata: ${dadosAta.titulo}`, 20, 20); doc.save('Ata.pdf'); }
     </script>
