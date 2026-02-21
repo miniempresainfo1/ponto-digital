@@ -26,7 +26,6 @@
     </div>
 
     <div id="painel" class="hidden-section max-w-7xl mx-auto p-4 md:p-8">
-        
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-5 rounded-3xl shadow-sm border border-slate-200 gap-4">
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xs italic">RH</div>
@@ -36,8 +35,7 @@
             <div class="flex flex-wrap gap-2 justify-center">
                 <button onclick="mudarAba('dashboard')" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-slate-100 text-slate-600 hover:bg-blue-50 transition">Chamadas</button>
                 <button onclick="mudarAba('mensagens'); carregarMensagens();" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-slate-100 text-slate-600 hover:bg-blue-50 transition relative">
-                    Mensagens
-                    <span id="badgeMsg" class="hidden-section absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-bounce"></span>
+                    Mensagens <span id="badgeMsg" class="hidden-section absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-bounce"></span>
                 </button>
                 <button onclick="mudarAba('feedbacks'); carregarFeedbacks();" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-slate-100 text-slate-600 hover:bg-blue-50 transition">Avaliações</button>
                 <button onclick="location.reload()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold text-[10px] uppercase">Sair</button>
@@ -63,42 +61,27 @@
                         <input type="text" id="titR" placeholder="Título da Reunião" class="border-2 border-slate-50 p-4 rounded-2xl outline-none text-sm bg-slate-50">
                         <input type="datetime-local" id="dataR" class="border-2 border-slate-50 p-4 rounded-2xl outline-none text-sm bg-slate-50">
                     </div>
-                    <button onclick="addReuniao()" class="w-full bg-[#1e293b] text-white font-black py-4 rounded-2xl shadow-xl uppercase text-xs tracking-widest">Criar Lista de Chamada</button>
+                    <button onclick="addReuniao()" class="w-full bg-[#1e293b] text-white font-black py-4 rounded-2xl shadow-xl uppercase text-xs tracking-widest">Criar Lista</button>
                 </div>
                 <div id="listaR" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left"></div>
             </div>
         </div>
 
-        <div id="aba-mensagens" class="hidden-section max-w-4xl mx-auto space-y-6">
-            <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200">
-                <h2 class="font-extrabold text-[10px] uppercase mb-6 italic tracking-widest flex items-center gap-2">📥 Caixa de Entrada (Ouvidoria)</h2>
-                <div id="containerMensagens" class="space-y-4"></div>
-            </div>
-        </div>
-
-        <div id="aba-feedbacks" class="hidden-section max-w-4xl mx-auto space-y-6">
-            <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200">
-                <h2 class="font-extrabold text-[10px] uppercase mb-6 italic tracking-widest flex items-center gap-2">⭐ Avaliações das Reuniões</h2>
-                <div id="containerFeedbacks" class="space-y-4"></div>
-            </div>
-        </div>
-
+        <div id="aba-mensagens" class="hidden-section max-w-4xl mx-auto space-y-6"><div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200"><h2 class="font-extrabold text-[10px] uppercase mb-6 italic tracking-widest">📥 Caixa de Entrada</h2><div id="containerMensagens" class="space-y-4"></div></div></div>
+        <div id="aba-feedbacks" class="hidden-section max-w-4xl mx-auto space-y-6"><div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200"><h2 class="font-extrabold text-[10px] uppercase mb-6 italic tracking-widest">⭐ Avaliações</h2><div id="containerFeedbacks" class="space-y-4"></div></div></div>
     </div>
 
     <div id="modalChamada" class="fixed inset-0 bg-slate-900/60 hidden-section flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white w-full max-w-5xl rounded-[2.5rem] p-8 shadow-2xl flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-start mb-6 border-b pb-4 text-left">
-                <div>
-                    <h3 id="chamadaTitulo" class="text-xl font-black text-slate-800 uppercase italic">---</h3>
-                    <p id="chamadaData" class="text-blue-500 font-bold text-[9px] mt-1 uppercase tracking-widest"></p>
-                </div>
+                <div><h3 id="chamadaTitulo" class="text-xl font-black text-slate-800 uppercase italic">---</h3><p id="chamadaData" class="text-blue-500 font-bold text-[9px] mt-1 uppercase tracking-widest"></p></div>
                 <button onclick="fecharModal()" class="text-slate-300 hover:text-red-500 font-black text-xl">×</button>
             </div>
             
             <div class="flex gap-4 mb-6 text-[9px] font-black uppercase text-left">
-                <div class="bg-green-50 text-green-600 px-3 py-1 rounded-full border border-green-100 italic">Presentes: <span id="countP">0</span></div>
-                <div class="bg-amber-50 text-amber-600 px-3 py-1 rounded-full border border-amber-100 italic">Justificados: <span id="countJ">0</span></div>
-                <div class="bg-red-50 text-red-600 px-3 py-1 rounded-full border border-red-100 italic">Faltas: <span id="countF">0</span></div>
+                <div class="bg-green-50 text-green-600 px-3 py-1 rounded-full border border-green-100">P: <span id="countP">0</span></div>
+                <div class="bg-amber-50 text-amber-600 px-3 py-1 rounded-full border border-amber-100">J: <span id="countJ">0</span></div>
+                <div class="bg-red-50 text-red-600 px-3 py-1 rounded-full border border-red-100">F: <span id="countF">0</span></div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden text-left">
@@ -108,7 +91,7 @@
                 </div>
                 <div class="flex flex-col">
                     <h4 class="text-[10px] font-black uppercase text-slate-400 mb-2 italic text-left">Ata da Reunião</h4>
-                    <textarea id="obsAta" oninput="salvarObs()" class="w-full flex-1 border-2 border-slate-50 p-4 rounded-2xl outline-none text-sm bg-slate-50 focus:border-blue-600" placeholder="Anote detalhes da reunião..."></textarea>
+                    <textarea id="obsAta" oninput="salvarObs()" class="w-full flex-1 border-2 border-slate-50 p-4 rounded-2xl outline-none text-sm bg-slate-50 focus:border-blue-600"></textarea>
                 </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
@@ -142,119 +125,34 @@
         }
 
         async function refresh() {
-            try {
-                const { data: f } = await db.from('funcionarios').select('*').order('nome');
-                const { data: rCount } = await db.from('reunioes').select('id');
-                const { data: pres } = await db.from('presencas').select('*');
-                const totalR = rCount ? rCount.length : 0;
+            const { data: f } = await db.from('funcionarios').select('*').order('nome');
+            const { data: rCount } = await db.from('reunioes').select('id');
+            const { data: pres } = await db.from('presencas').select('*');
+            const totalR = rCount ? rCount.length : 0;
 
-                document.getElementById('listaF').innerHTML = f.map(func => {
-                    const pc = pres ? pres.filter(x => x.funcionario_id === func.id && x.esteve_presente).length : 0;
-                    const jc = pres ? pres.filter(x => x.funcionario_id === func.id && !x.esteve_presente && x.justificativa && x.justificativa !== 'NÃO').length : 0;
-                    const fl = pres ? pres.filter(x => x.funcionario_id === func.id && !x.esteve_presente && (!x.justificativa || x.justificativa === "NÃO")).length : 0;
-                    const freq = totalR > 0 ? ((pc / totalR) * 100).toFixed(0) : 0;
+            document.getElementById('listaF').innerHTML = f.map(func => {
+                const pc = pres ? pres.filter(x => x.funcionario_id === func.id && x.esteve_presente).length : 0;
+                const jc = pres ? pres.filter(x => x.funcionario_id === func.id && !x.esteve_presente && x.justificativa && x.justificativa !== 'NÃO').length : 0;
+                const fl = pres ? pres.filter(x => x.funcionario_id === func.id && !x.esteve_presente && (!x.justificativa || x.justificativa === "NÃO")).length : 0;
+                const freq = totalR > 0 ? ((pc / totalR) * 100).toFixed(0) : 0;
 
-                    return `
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative text-left">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex flex-col truncate pr-10">
-                                <span class="font-bold text-slate-800 text-[10px] uppercase truncate">${func.nome}</span>
-                                <span class="text-blue-600 text-[8px] font-black uppercase mt-1">Frequência: ${freq}%</span>
-                            </div>
-                            <button onclick="removerFunc('${func.id}')" class="text-red-300 hover:text-red-500 font-bold text-[8px]">EXCLUIR</button>
-                        </div>
-                        <div class="flex gap-1 text-[7px] font-black text-center">
-                            <div class="flex-1 bg-green-100 text-green-700 p-1.5 rounded-lg border border-green-200">P: ${pc}</div>
-                            <div class="flex-1 bg-amber-100 text-amber-700 p-1.5 rounded-lg border border-amber-200">J: ${jc}</div>
-                            <div class="flex-1 bg-red-100 text-red-700 p-1.5 rounded-lg border border-red-200">F: ${fl}</div>
-                        </div>
-                    </div>`;
-                }).join('');
-
-                const { data: r } = await db.from('reunioes').select('*').order('data_hora', { ascending: false });
-                document.getElementById('listaR').innerHTML = r ? r.map(i => `
-                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-blue-500 cursor-pointer relative text-left" 
-                         onclick="abrir('${i.id}')">
-                        <button onclick="event.stopPropagation(); deletarR('${i.id}')" class="absolute top-4 right-4 text-red-200 hover:text-red-500 font-bold text-[8px]">APAGAR</button>
-                        <h4 class="font-black text-xs uppercase italic text-slate-800">${i.titulo}</h4>
-                        <p class="text-[9px] text-slate-400 font-bold mt-1">${new Date(i.data_hora).toLocaleString('pt-BR')}</p>
-                    </div>`).join('') : '';
-
-                checarMensagensNaoLidas();
-            } catch (err) { console.error(err); }
-        }
-
-        // ================= FUNÇÕES DE MENSAGENS E FEEDBACKS =================
-        async function checarMensagensNaoLidas() {
-            try {
-                const { data } = await db.from('mensagens').select('id').eq('lida', false);
-                if (data && data.length > 0) document.getElementById('badgeMsg').classList.remove('hidden-section');
-                else document.getElementById('badgeMsg').classList.add('hidden-section');
-            } catch (e) { console.warn("Aviso:", e); }
-        }
-
-        async function carregarMensagens() {
-            try {
-                const { data } = await db.from('mensagens').select('*').order('created_at', { ascending: false });
-                
-                if (!data || data.length === 0) {
-                    document.getElementById('containerMensagens').innerHTML = '<p class="text-xs text-slate-400 italic">Caixa de entrada vazia.</p>';
-                    return;
-                }
-
-                document.getElementById('containerMensagens').innerHTML = data.map(m => `
-                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 relative">
-                        <button onclick="deletarMensagem('${m.id}')" class="absolute top-4 right-4 text-red-300 hover:text-red-500 font-bold text-[8px] uppercase">APAGAR</button>
-                        <div class="flex justify-between items-start mb-3 pr-12">
-                            <span class="font-black text-blue-600 uppercase text-[10px]">${m.nome || 'Anônimo'}</span>
-                            <span class="text-[8px] font-bold text-slate-400 uppercase">${new Date(m.created_at).toLocaleString('pt-BR')}</span>
-                        </div>
-                        <p class="text-sm text-slate-700">${m.conteudo}</p>
+                return `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative text-left flex justify-between">
+                    <div class="flex flex-col truncate pr-10">
+                        <span class="font-bold text-slate-800 text-[10px] uppercase">${func.nome}</span>
+                        <span class="text-blue-600 text-[8px] font-black uppercase mt-1">Frequência: ${freq}%</span>
                     </div>
-                `).join('');
+                    <button onclick="removerFunc('${func.id}')" class="text-red-300 hover:text-red-500 font-bold text-[8px]">EXCLUIR</button>
+                </div>`;
+            }).join('');
 
-                await db.from('mensagens').update({ lida: true }).neq('id', '00000000-0000-0000-0000-000000000000');
-                document.getElementById('badgeMsg').classList.add('hidden-section');
-            } catch (e) { console.error("Erro mensagens:", e); }
+            const { data: r } = await db.from('reunioes').select('*').order('data_hora', { ascending: false });
+            document.getElementById('listaR').innerHTML = r ? r.map(i => `
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-blue-500 cursor-pointer relative text-left" onclick="abrir('${i.id}')">
+                    <button onclick="event.stopPropagation(); deletarR('${i.id}')" class="absolute top-4 right-4 text-red-200 hover:text-red-500 font-bold text-[8px]">APAGAR</button>
+                    <h4 class="font-black text-xs uppercase italic text-slate-800">${i.titulo}</h4>
+                    <p class="text-[9px] text-slate-400 font-bold mt-1">${new Date(i.data_hora).toLocaleString('pt-BR')}</p>
+                </div>`).join('') : '';
         }
-
-        async function carregarFeedbacks() {
-            try {
-                const { data } = await db.from('avaliacoes_reuniao').select('*, reunioes(titulo)').order('created_at', { ascending: false });
-                
-                if (!data || data.length === 0) {
-                    document.getElementById('containerFeedbacks').innerHTML = '<p class="text-xs text-slate-400 italic">Nenhuma avaliação encontrada.</p>';
-                    return;
-                }
-
-                document.getElementById('containerFeedbacks').innerHTML = data.map(f => `
-                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 relative">
-                        <button onclick="deletarFeedback('${f.id}')" class="absolute top-4 right-4 text-red-300 hover:text-red-500 font-bold text-[8px] uppercase">APAGAR</button>
-                        <div class="flex justify-between items-start mb-3 pr-12">
-                            <span class="font-black text-amber-600 uppercase text-[10px]">${f.reunioes?.titulo || 'Reunião Excluída'}</span>
-                            <span class="bg-amber-100 text-amber-800 text-[9px] font-black px-3 py-1 rounded-lg">Nota: ${f.nota || '-'}</span>
-                        </div>
-                        <p class="text-sm text-slate-700 italic">"${f.comentario}"</p>
-                        <p class="text-[8px] font-bold text-slate-400 uppercase mt-2">${new Date(f.created_at).toLocaleString('pt-BR')}</p>
-                    </div>
-                `).join('');
-            } catch (e) { console.error("Erro feedbacks:", e); }
-        }
-
-        async function deletarMensagem(id) {
-            if(confirm("Tem certeza que deseja apagar esta mensagem?")) {
-                await db.from('mensagens').delete().eq('id', id);
-                carregarMensagens(); // Atualiza a lista na hora
-            }
-        }
-
-        async function deletarFeedback(id) {
-            if(confirm("Tem certeza que deseja apagar esta avaliação?")) {
-                await db.from('avaliacoes_reuniao').delete().eq('id', id);
-                carregarFeedbacks(); // Atualiza a lista na hora
-            }
-        }
-        // ====================================================================
 
         async function abrir(id) {
             idAtivo = id;
@@ -263,7 +161,6 @@
             const { data: p = [] } = await db.from('presencas').select('*').eq('reuniao_id', id);
 
             nomesPDF = { titulo: r.titulo, data: new Date(r.data_hora).toLocaleString('pt-BR'), presentes: [], faltas: [], justificados: [] };
-            
             document.getElementById('chamadaTitulo').innerText = r.titulo;
             document.getElementById('chamadaData').innerText = nomesPDF.data;
             document.getElementById('obsAta').value = r.observacoes || '';
@@ -280,11 +177,10 @@
                 else if (s === false && j && j !== "NÃO") { cj++; nomesPDF.justificados.push(`${func.nome} (${j})`); }
                 else if (s === false) { cf++; nomesPDF.faltas.push(func.nome); }
 
-                return `
-                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                return `<div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
                     <div class="flex flex-col truncate pr-2 text-left">
                         <span class="font-bold text-slate-700 text-[9px] uppercase truncate">${func.nome}</span>
-                        ${s === false && j && j !== 'NÃO' ? `<span class="text-[7px] text-amber-600 font-bold italic truncate">${j}</span>` : ''}
+                        ${s === false && j && j !== 'NÃO' ? `<span class="text-[7px] text-amber-600 font-bold italic">${j}</span>` : ''}
                     </div>
                     <div class="flex gap-1">
                         <button onclick="marcar('${func.id}', true, false)" class="${s === true ? 'bg-green-600 text-white' : 'bg-white text-slate-300'} border px-3 py-1.5 rounded-xl text-[8px] font-black">P</button>
@@ -294,19 +190,27 @@
                 </div>`;
             }).join('');
             
-            document.getElementById('countP').innerText = cp;
-            document.getElementById('countJ').innerText = cj;
-            document.getElementById('countF').innerText = cf;
+            document.getElementById('countP').innerText = cp; document.getElementById('countJ').innerText = cj; document.getElementById('countF').innerText = cf;
         }
 
         async function marcar(fid, s, j) {
             let motiv = null;
             if(j) { motiv = prompt("Motivo da Justificativa:"); if(!motiv) return; }
+            
             const payload = { reuniao_id: idAtivo, funcionario_id: fid, esteve_presente: s, justificativa: motiv || (s === false ? "NÃO" : null) };
             const { data: ex } = await db.from('presencas').select('id').eq('reuniao_id', idAtivo).eq('funcionario_id', fid).maybeSingle();
-            if(ex) await db.from('presencas').update(payload).eq('id', ex.id);
-            else await db.from('presencas').insert([payload]);
-            await abrir(idAtivo);
+            
+            let resultado;
+            if(ex) resultado = await db.from('presencas').update(payload).eq('id', ex.id);
+            else resultado = await db.from('presencas').insert([payload]);
+
+            if (resultado.error) {
+                alert("ERRO DO BANCO DE DADOS:\n" + resultado.error.message + "\n\nO Supabase bloqueou a ação. Verifique se você rodou o código SQL no Supabase!");
+                console.error(resultado.error);
+            } else {
+                await abrir(idAtivo); // Atualiza na tela
+                refresh(); // Atualiza contador externo
+            }
         }
 
         async function salvarObs() { if(idAtivo) await db.from('reunioes').update({ observacoes: document.getElementById('obsAta').value }).eq('id', idAtivo); }
@@ -316,6 +220,7 @@
         async function deletarR(id) { if(confirm("Apagar?")) { await db.from('reunioes').delete().eq('id', id); refresh(); } }
         function fecharModal() { document.getElementById('modalChamada').classList.add('hidden-section'); refresh(); }
 
+        // ================= FUNÇÕES PDF (COM QUEBRA DE LINHA MELHORADA) =================
         function gerarRelatorioPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -337,29 +242,19 @@
             
             let currentY = 55 + (ataSplit.length * 5);
             
-            doc.setFont("helvetica", "bold");
-            doc.text(`PRESENTES (${nomesPDF.presentes.length}):`, 20, currentY);
+            doc.setFont("helvetica", "bold"); doc.text(`PRESENTES (${nomesPDF.presentes.length}):`, 20, currentY);
             doc.setFont("helvetica", "normal");
-            const presSplit = doc.splitTextToSize(nomesPDF.presentes.join(", ") || 'Nenhum', 170);
-            doc.text(presSplit, 20, currentY + 5);
-            
-            currentY += 15 + (presSplit.length * 5);
-            if(currentY > 270) { doc.addPage(); currentY = 20; }
+            const presSplit = doc.splitTextToSize(nomesPDF.presentes.join(", ") || 'Nenhum', 170); doc.text(presSplit, 20, currentY + 5);
+            currentY += 15 + (presSplit.length * 5); if(currentY > 270) { doc.addPage(); currentY = 20; }
 
-            doc.setFont("helvetica", "bold");
-            doc.text(`JUSTIFICADOS (${nomesPDF.justificados.length}):`, 20, currentY);
+            doc.setFont("helvetica", "bold"); doc.text(`JUSTIFICADOS (${nomesPDF.justificados.length}):`, 20, currentY);
             doc.setFont("helvetica", "normal");
-            const justSplit = doc.splitTextToSize(nomesPDF.justificados.join(", ") || 'Nenhum', 170);
-            doc.text(justSplit, 20, currentY + 5);
-            
-            currentY += 15 + (justSplit.length * 5);
-            if(currentY > 270) { doc.addPage(); currentY = 20; }
+            const justSplit = doc.splitTextToSize(nomesPDF.justificados.join(", ") || 'Nenhum', 170); doc.text(justSplit, 20, currentY + 5);
+            currentY += 15 + (justSplit.length * 5); if(currentY > 270) { doc.addPage(); currentY = 20; }
 
-            doc.setFont("helvetica", "bold");
-            doc.text(`FALTAS (${nomesPDF.faltas.length}):`, 20, currentY);
+            doc.setFont("helvetica", "bold"); doc.text(`FALTAS (${nomesPDF.faltas.length}):`, 20, currentY);
             doc.setFont("helvetica", "normal");
-            const faltSplit = doc.splitTextToSize(nomesPDF.faltas.join(", ") || "Nenhuma falta.", 170);
-            doc.text(faltSplit, 20, currentY + 5);
+            const faltSplit = doc.splitTextToSize(nomesPDF.faltas.join(", ") || "Nenhuma falta.", 170); doc.text(faltSplit, 20, currentY + 5);
 
             doc.save(`Relatorio_${nomesPDF.titulo.replace(/\s+/g, '_')}.pdf`);
         }
