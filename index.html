@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RH Administrativo - Gestão Total</title>
+    <title>RH Administrativo - Elite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -31,7 +31,6 @@
                 <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xs italic">RH</div>
                 <h1 class="text-sm font-black text-slate-800 uppercase italic">Painel de Gestão</h1>
             </div>
-            
             <div class="flex flex-wrap gap-2 justify-center">
                 <button onclick="mudarAba('dashboard')" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-slate-100 text-slate-600 hover:bg-blue-50 transition">Chamadas</button>
                 <button onclick="mudarAba('mensagens'); carregarMensagens();" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-slate-100 text-slate-600 hover:bg-blue-50 transition relative">
@@ -53,7 +52,6 @@
                     <div id="listaF" class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scroll"></div>
                 </div>
             </div>
-
             <div class="lg:col-span-8 space-y-6">
                 <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200 text-left">
                     <h2 class="font-extrabold text-[10px] uppercase mb-4 italic tracking-widest text-left">📅 Lançar Reunião</h2>
@@ -67,8 +65,18 @@
             </div>
         </div>
 
-        <div id="aba-mensagens" class="hidden-section max-w-4xl mx-auto space-y-6"><div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200"><h2 class="font-extrabold text-[10px] uppercase mb-6 italic tracking-widest">📥 Caixa de Entrada</h2><div id="containerMensagens" class="space-y-4"></div></div></div>
-        <div id="aba-feedbacks" class="hidden-section max-w-4xl mx-auto space-y-6"><div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200"><h2 class="font-extrabold text-[10px] uppercase mb-6 italic tracking-widest">⭐ Avaliações</h2><div id="containerFeedbacks" class="space-y-4"></div></div></div>
+        <div id="aba-mensagens" class="hidden-section max-w-4xl mx-auto space-y-6">
+            <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200">
+                <h2 class="font-extrabold text-[10px] uppercase mb-6 italic tracking-widest">📥 Caixa de Entrada</h2>
+                <div id="containerMensagens" class="space-y-4"></div>
+            </div>
+        </div>
+        <div id="aba-feedbacks" class="hidden-section max-w-4xl mx-auto space-y-6">
+            <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200">
+                <h2 class="font-extrabold text-[10px] uppercase mb-6 italic tracking-widest">⭐ Avaliações</h2>
+                <div id="containerFeedbacks" class="space-y-4"></div>
+            </div>
+        </div>
     </div>
 
     <div id="modalChamada" class="fixed inset-0 bg-slate-900/60 hidden-section flex items-center justify-center p-4 z-50 backdrop-blur-sm">
@@ -77,26 +85,21 @@
                 <div><h3 id="chamadaTitulo" class="text-xl font-black text-slate-800 uppercase italic">---</h3><p id="chamadaData" class="text-blue-500 font-bold text-[9px] mt-1 uppercase tracking-widest"></p></div>
                 <button onclick="fecharModal()" class="text-slate-300 hover:text-red-500 font-black text-xl">×</button>
             </div>
-            
             <div class="flex gap-4 mb-6 text-[9px] font-black uppercase text-left">
                 <div class="bg-green-50 text-green-600 px-3 py-1 rounded-full border border-green-100">P: <span id="countP">0</span></div>
                 <div class="bg-amber-50 text-amber-600 px-3 py-1 rounded-full border border-amber-100">J: <span id="countJ">0</span></div>
                 <div class="bg-red-50 text-red-600 px-3 py-1 rounded-full border border-red-100">F: <span id="countF">0</span></div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden text-left">
-                <div class="overflow-y-auto pr-2 custom-scroll max-h-[50vh]">
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 mb-4 italic">Lista Nominal</h4>
-                    <div id="corpoChamada" class="space-y-2"></div>
-                </div>
+                <div id="corpoChamada" class="overflow-y-auto pr-2 custom-scroll max-h-[50vh] space-y-2"></div>
                 <div class="flex flex-col">
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 mb-2 italic text-left">Ata da Reunião</h4>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 mb-2 italic">Ata / Observações</h4>
                     <textarea id="obsAta" oninput="salvarObs()" class="w-full flex-1 border-2 border-slate-50 p-4 rounded-2xl outline-none text-sm bg-slate-50 focus:border-blue-600"></textarea>
                 </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
                 <button onclick="gerarRelatorioPDF()" class="bg-slate-900 text-white font-black py-4 rounded-xl text-[10px] uppercase shadow-lg">Exportar PDF</button>
-                <button onclick="fecharModal()" class="bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs">Salvar e Concluir</button>
+                <button onclick="fecharModal()" class="bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs">Concluir</button>
             </div>
         </div>
     </div>
@@ -105,7 +108,6 @@
         const SB_URL = 'https://vbgztyphwwrxdmfefnnc.supabase.co';
         const SB_KEY = 'sb_publishable_goDFv_bti5TRne64uzpzoA_bFECMHlg';
         const db = supabase.createClient(SB_URL, SB_KEY);
-
         let idAtivo = null;
         let nomesPDF = { titulo: "", data: "", presentes: [], faltas: [], justificados: [] };
 
@@ -118,9 +120,7 @@
         }
 
         function mudarAba(abaId) {
-            document.getElementById('aba-dashboard').classList.add('hidden-section');
-            document.getElementById('aba-mensagens').classList.add('hidden-section');
-            document.getElementById('aba-feedbacks').classList.add('hidden-section');
+            ['dashboard', 'mensagens', 'feedbacks'].forEach(a => document.getElementById('aba-' + a).classList.add('hidden-section'));
             document.getElementById('aba-' + abaId).classList.remove('hidden-section');
         }
 
@@ -133,25 +133,24 @@
             document.getElementById('listaF').innerHTML = f.map(func => {
                 const pc = pres ? pres.filter(x => x.funcionario_id === func.id && x.esteve_presente).length : 0;
                 const jc = pres ? pres.filter(x => x.funcionario_id === func.id && !x.esteve_presente && x.justificativa && x.justificativa !== 'NÃO').length : 0;
-                const fl = pres ? pres.filter(x => x.funcionario_id === func.id && !x.esteve_presente && (!x.justificativa || x.justificativa === "NÃO")).length : 0;
                 const freq = totalR > 0 ? ((pc / totalR) * 100).toFixed(0) : 0;
-
-                return `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative text-left flex justify-between">
-                    <div class="flex flex-col truncate pr-10">
-                        <span class="font-bold text-slate-800 text-[10px] uppercase">${func.nome}</span>
-                        <span class="text-blue-600 text-[8px] font-black uppercase mt-1">Frequência: ${freq}%</span>
+                return `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between items-center mb-2">
+                    <div class="flex flex-col truncate pr-4 text-left">
+                        <span class="font-bold text-slate-800 text-[10px] uppercase truncate">${func.nome}</span>
+                        <span class="text-blue-600 text-[8px] font-black uppercase">Freq: ${freq}% | P:${pc} J:${jc}</span>
                     </div>
                     <button onclick="removerFunc('${func.id}')" class="text-red-300 hover:text-red-500 font-bold text-[8px]">EXCLUIR</button>
                 </div>`;
             }).join('');
 
             const { data: r } = await db.from('reunioes').select('*').order('data_hora', { ascending: false });
-            document.getElementById('listaR').innerHTML = r ? r.map(i => `
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-blue-500 cursor-pointer relative text-left" onclick="abrir('${i.id}')">
+            document.getElementById('listaR').innerHTML = r.map(i => `
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-blue-500 cursor-pointer relative" onclick="abrir('${i.id}')">
                     <button onclick="event.stopPropagation(); deletarR('${i.id}')" class="absolute top-4 right-4 text-red-200 hover:text-red-500 font-bold text-[8px]">APAGAR</button>
-                    <h4 class="font-black text-xs uppercase italic text-slate-800">${i.titulo}</h4>
+                    <h4 class="font-black text-xs uppercase italic">${i.titulo}</h4>
                     <p class="text-[9px] text-slate-400 font-bold mt-1">${new Date(i.data_hora).toLocaleString('pt-BR')}</p>
-                </div>`).join('') : '';
+                </div>`).join('');
+            checarMensagensNaoLidas();
         }
 
         async function abrir(id) {
@@ -167,96 +166,85 @@
             document.getElementById('modalChamada').classList.remove('hidden-section');
 
             let cp=0, cj=0, cf=0;
-
             document.getElementById('corpoChamada').innerHTML = f.map(func => {
-                const pres = p.find(x => x.funcionario_id === func.id);
-                const s = pres ? pres.esteve_presente : null;
-                const j = pres ? pres.justificativa : null;
-
+                const pr = p.find(x => x.funcionario_id === func.id);
+                const s = pr ? pr.esteve_presente : null;
+                const j = pr ? pr.justificativa : null;
                 if (s === true) { cp++; nomesPDF.presentes.push(func.nome); }
                 else if (s === false && j && j !== "NÃO") { cj++; nomesPDF.justificados.push(`${func.nome} (${j})`); }
                 else if (s === false) { cf++; nomesPDF.faltas.push(func.nome); }
 
-                return `<div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                return `<div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border">
                     <div class="flex flex-col truncate pr-2 text-left">
-                        <span class="font-bold text-slate-700 text-[9px] uppercase truncate">${func.nome}</span>
+                        <span class="font-bold text-[9px] uppercase">${func.nome}</span>
                         ${s === false && j && j !== 'NÃO' ? `<span class="text-[7px] text-amber-600 font-bold italic">${j}</span>` : ''}
                     </div>
                     <div class="flex gap-1">
-                        <button onclick="marcar('${func.id}', true, false)" class="${s === true ? 'bg-green-600 text-white' : 'bg-white text-slate-300'} border px-3 py-1.5 rounded-xl text-[8px] font-black">P</button>
-                        <button onclick="marcar('${func.id}', false, true)" class="${s === false && (j && j !== 'NÃO') ? 'bg-amber-500 text-white' : 'bg-white text-slate-300'} border px-3 py-1.5 rounded-xl text-[8px] font-black">J</button>
-                        <button onclick="marcar('${func.id}', false, false)" class="${s === false && (!j || j === 'NÃO') ? 'bg-red-600 text-white' : 'bg-white text-slate-300'} border px-3 py-1.5 rounded-xl text-[8px] font-black">F</button>
+                        <button onclick="marcar('${func.id}', true, false)" class="${s === true ? 'bg-green-600 text-white' : 'bg-white'} border px-3 py-1 rounded-lg text-[8px] font-black">P</button>
+                        <button onclick="marcar('${func.id}', false, true)" class="${s === false && (j && j !== 'NÃO') ? 'bg-amber-500 text-white' : 'bg-white'} border px-3 py-1 rounded-lg text-[8px] font-black">J</button>
+                        <button onclick="marcar('${func.id}', false, false)" class="${s === false && (!j || j === 'NÃO') ? 'bg-red-600 text-white' : 'bg-white'} border px-3 py-1 rounded-lg text-[8px] font-black">F</button>
                     </div>
                 </div>`;
             }).join('');
-            
             document.getElementById('countP').innerText = cp; document.getElementById('countJ').innerText = cj; document.getElementById('countF').innerText = cf;
         }
 
         async function marcar(fid, s, j) {
             let motiv = null;
-            if(j) { motiv = prompt("Motivo da Justificativa:"); if(!motiv) return; }
-            
-            const payload = { reuniao_id: idAtivo, funcionario_id: fid, esteve_presente: s, justificativa: motiv || (s === false ? "NÃO" : null) };
+            if(j) { motiv = prompt("Motivo:"); if(!motiv) return; }
+            const { data: fData } = await db.from('funcionarios').select('nome').eq('id', fid).single();
+            const payload = { reuniao_id: idAtivo, funcionario_id: fid, nome_funcionario: fData.nome, esteve_presente: s, justificativa: motiv || (s === false ? "NÃO" : null) };
             const { data: ex } = await db.from('presencas').select('id').eq('reuniao_id', idAtivo).eq('funcionario_id', fid).maybeSingle();
-            
-            let resultado;
-            if(ex) resultado = await db.from('presencas').update(payload).eq('id', ex.id);
-            else resultado = await db.from('presencas').insert([payload]);
+            if(ex) await db.from('presencas').update(payload).eq('id', ex.id);
+            else await db.from('presencas').insert([payload]);
+            await abrir(idAtivo); refresh();
+        }
 
-            if (resultado.error) {
-                alert("ERRO DO BANCO DE DADOS:\n" + resultado.error.message + "\n\nO Supabase bloqueou a ação. Verifique se você rodou o código SQL no Supabase!");
-                console.error(resultado.error);
-            } else {
-                await abrir(idAtivo); // Atualiza na tela
-                refresh(); // Atualiza contador externo
-            }
+        async function checarMensagensNaoLidas() {
+            const { data } = await db.from('mensagens').select('id').eq('lida', false);
+            if (data?.length > 0) document.getElementById('badgeMsg').classList.remove('hidden-section');
+            else document.getElementById('badgeMsg').classList.add('hidden-section');
+        }
+
+        async function carregarMensagens() {
+            const { data } = await db.from('mensagens').select('*').order('created_at', { ascending: false });
+            document.getElementById('containerMensagens').innerHTML = data.map(m => `<div class="bg-slate-50 p-5 rounded-2xl border relative">
+                <button onclick="deletarM('${m.id}')" class="absolute top-4 right-4 text-red-300 text-[8px] font-bold">APAGAR</button>
+                <span class="font-black text-blue-600 text-[10px] uppercase">${m.nome || 'Anônimo'}</span>
+                <p class="text-sm text-slate-700 mt-2">${m.conteudo}</p>
+            </div>`).join('');
+            await db.from('mensagens').update({ lida: true }).neq('id', '00000000-0000-0000-0000-000000000000');
+        }
+
+        async function carregarFeedbacks() {
+            const { data } = await db.from('avaliacoes_reuniao').select('*, reunioes(titulo)').order('created_at', { ascending: false });
+            document.getElementById('containerFeedbacks').innerHTML = data.map(f => `<div class="bg-slate-50 p-5 rounded-2xl border relative">
+                <button onclick="deletarF('${f.id}')" class="absolute top-4 right-4 text-red-300 text-[8px] font-bold">APAGAR</button>
+                <span class="font-black text-amber-600 text-[10px] uppercase">${f.reunioes?.titulo || 'Reunião Excluída'}</span>
+                <p class="text-sm italic mt-2">"${f.comentario}" (Nota: ${f.nota})</p>
+            </div>`).join('');
         }
 
         async function salvarObs() { if(idAtivo) await db.from('reunioes').update({ observacoes: document.getElementById('obsAta').value }).eq('id', idAtivo); }
-        async function addFunc() { const n = document.getElementById('novoFuncionario').value; if(n) await db.from('funcionarios').insert([{nome:n}]); document.getElementById('novoFuncionario').value=''; refresh(); }
-        async function removerFunc(id) { if(confirm("Remover?")) { await db.from('funcionarios').delete().eq('id', id); refresh(); } }
-        async function addReuniao() { const t = document.getElementById('titR').value, d = document.getElementById('dataR').value; if(t && d) await db.from('reunioes').insert([{titulo:t, data_hora:new Date(d).toISOString()}]); refresh(); }
+        async function deletarM(id) { if(confirm("Apagar?")) { await db.from('mensagens').delete().eq('id', id); carregarMensagens(); } }
+        async function deletarF(id) { if(confirm("Apagar?")) { await db.from('avaliacoes_reuniao').delete().eq('id', id); carregarFeedbacks(); } }
         async function deletarR(id) { if(confirm("Apagar?")) { await db.from('reunioes').delete().eq('id', id); refresh(); } }
+        async function removerFunc(id) { if(confirm("Remover?")) { await db.from('funcionarios').delete().eq('id', id); refresh(); } }
+        async function addFunc() { const n = document.getElementById('novoFuncionario').value; if(n) await db.from('funcionarios').insert([{nome:n}]); document.getElementById('novoFuncionario').value=''; refresh(); }
+        async function addReuniao() { const t = document.getElementById('titR').value, d = document.getElementById('dataR').value; if(t && d) await db.from('reunioes').insert([{titulo:t, data_hora:new Date(d).toISOString()}]); refresh(); }
         function fecharModal() { document.getElementById('modalChamada').classList.add('hidden-section'); refresh(); }
 
-        // ================= FUNÇÕES PDF (COM QUEBRA DE LINHA MELHORADA) =================
         function gerarRelatorioPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const ata = document.getElementById('obsAta').value || 'Sem observações.';
-            
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(16);
-            doc.text(`RELATÓRIO DE CHAMADA: ${nomesPDF.titulo}`, 105, 20, { align: "center" });
-            
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Data: ${nomesPDF.data}`, 20, 30);
-            
-            doc.setFont("helvetica", "bold");
-            doc.text("ATA / OBSERVAÇÕES:", 20, 40);
-            doc.setFont("helvetica", "normal");
-            const ataSplit = doc.splitTextToSize(ata, 170);
-            doc.text(ataSplit, 20, 45);
-            
-            let currentY = 55 + (ataSplit.length * 5);
-            
-            doc.setFont("helvetica", "bold"); doc.text(`PRESENTES (${nomesPDF.presentes.length}):`, 20, currentY);
-            doc.setFont("helvetica", "normal");
-            const presSplit = doc.splitTextToSize(nomesPDF.presentes.join(", ") || 'Nenhum', 170); doc.text(presSplit, 20, currentY + 5);
-            currentY += 15 + (presSplit.length * 5); if(currentY > 270) { doc.addPage(); currentY = 20; }
-
-            doc.setFont("helvetica", "bold"); doc.text(`JUSTIFICADOS (${nomesPDF.justificados.length}):`, 20, currentY);
-            doc.setFont("helvetica", "normal");
-            const justSplit = doc.splitTextToSize(nomesPDF.justificados.join(", ") || 'Nenhum', 170); doc.text(justSplit, 20, currentY + 5);
-            currentY += 15 + (justSplit.length * 5); if(currentY > 270) { doc.addPage(); currentY = 20; }
-
-            doc.setFont("helvetica", "bold"); doc.text(`FALTAS (${nomesPDF.faltas.length}):`, 20, currentY);
-            doc.setFont("helvetica", "normal");
-            const faltSplit = doc.splitTextToSize(nomesPDF.faltas.join(", ") || "Nenhuma falta.", 170); doc.text(faltSplit, 20, currentY + 5);
-
-            doc.save(`Relatorio_${nomesPDF.titulo.replace(/\s+/g, '_')}.pdf`);
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.setFont("helvetica", "bold"); doc.text(`RELATÓRIO: ${nomesPDF.titulo}`, 105, 20, { align: "center" });
+            doc.setFontSize(10); doc.text(`Data: ${nomesPDF.data}`, 20, 30);
+            doc.text("ATA:", 20, 40); doc.setFont("helvetica", "normal");
+            const ata = doc.splitTextToSize(document.getElementById('obsAta').value || 'Sem ata.', 170); doc.text(ata, 20, 45);
+            let y = 60 + (ata.length * 5);
+            doc.setFont("helvetica", "bold"); doc.text(`PRESENTES:`, 20, y); doc.setFont("helvetica", "normal"); doc.text(nomesPDF.presentes.join(", "), 20, y+5, {maxWidth:170});
+            y += 20; doc.setFont("helvetica", "bold"); doc.text(`JUSTIFICADOS:`, 20, y); doc.setFont("helvetica", "normal"); doc.text(nomesPDF.justificados.join(", "), 20, y+5, {maxWidth:170});
+            y += 20; doc.setFont("helvetica", "bold"); doc.text(`FALTAS:`, 20, y); doc.setFont("helvetica", "normal"); doc.text(nomesPDF.faltas.join(", ") || 'Nenhuma.', 20, y+5, {maxWidth:170});
+            doc.save(`Ata_${nomesPDF.titulo}.pdf`);
         }
     </script>
 </body>
